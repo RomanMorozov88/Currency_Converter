@@ -6,6 +6,9 @@ import javax.persistence.*;
 @Table(name = "valutes")
 public class ValuteModel {
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private int primary_key;
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "date", nullable = false)
     private ValCursModel date;
@@ -14,10 +17,17 @@ public class ValuteModel {
     private long nominal;
     private String name;
     private String value;
-    @Id
     private String id;
 
     public ValuteModel() {
+    }
+
+    public int getPrimary_key() {
+        return primary_key;
+    }
+
+    public void setPrimary_key(int primary_key) {
+        this.primary_key = primary_key;
     }
 
     public ValCursModel getDate() {
