@@ -14,8 +14,8 @@ public class Operation {
     private CurrencyPair pair;
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "date", nullable = false)
-    private ValCursModel date;
-    private long amount;
+    private DateCurs date;
+    private double amount;
 
     public Operation() {
     }
@@ -36,19 +36,19 @@ public class Operation {
         this.pair = pair;
     }
 
-    public ValCursModel getDate() {
+    public DateCurs getDate() {
         return date;
     }
 
-    public void setDate(ValCursModel date) {
+    public void setDate(DateCurs date) {
         this.date = date;
     }
 
-    public long getAmount() {
+    public double getAmount() {
         return amount;
     }
 
-    public void setAmount(long amount) {
+    public void setAmount(double amount) {
         this.amount = amount;
     }
 }

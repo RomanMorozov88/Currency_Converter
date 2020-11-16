@@ -7,27 +7,27 @@ import java.util.List;
 
 @Entity
 @Table(name = "dates")
-public class ValCursModel {
+public class DateCurs {
 
     @OneToMany(mappedBy = "date", cascade = CascadeType.ALL)
-    private List<ValuteModel> valutes = new ArrayList<>();
+    private List<ExchangeRate> valutes = new ArrayList<>();
     @Id
     @Temporal(TemporalType.DATE)
     private Calendar date;
     private String name;
 
-    public ValCursModel() {
+    public DateCurs() {
     }
 
-    public List<ValuteModel> getValutes() {
+    public List<ExchangeRate> getValutes() {
         return valutes;
     }
 
-    public void setValutes(List<ValuteModel> valutes) {
+    public void setValutes(List<ExchangeRate> valutes) {
         this.valutes = valutes;
     }
 
-    public void setValute(ValuteModel valute) {
+    public void setValute(ExchangeRate valute) {
         this.valutes.add(valute);
     }
 
