@@ -3,7 +3,8 @@ package morozov.ru.service.util;
 import morozov.ru.model.fromxsdcentralbank.ValCurs;
 import morozov.ru.model.workingmodel.DateCurs;
 import morozov.ru.model.workingmodel.ExchangeRate;
-import morozov.ru.model.workingmodel.ValuteInfo;
+import morozov.ru.model.workingmodel.СurrencyInfo;
+import org.springframework.stereotype.Component;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -17,42 +18,43 @@ import java.util.List;
  * ValCurs с вложенным ValCurs.Valute в два разных класса,
  * необходимых для наших нужд.
  */
+@Component
 public class ValCursDistillator {
 
-    private static final String DATE_FORMAT = "dd.MM.yyyy";
-    private static final SimpleDateFormat SIMPLE_DATE_FORMAT = new SimpleDateFormat(DATE_FORMAT);
+    private final String DATE_FORMAT = "dd.MM.yyyy";
+    private final SimpleDateFormat SIMPLE_DATE_FORMAT = new SimpleDateFormat(DATE_FORMAT);
 
-    public static DateCurs dateDistillation(ValCurs valCurs) throws ParseException {
+    public DateCurs dateDistillation(ValCurs valCurs) throws ParseException {
         DateCurs result = new DateCurs();
         result.setName(valCurs.getName());
-        result.setDate(dateConverter(valCurs.getDate()));
+        result.setDate(this.dateConverter(valCurs.getDate()));
         List<ExchangeRate> newValutes = result.getValutes();
         ExchangeRate exchangeRate = null;
         for (ValCurs.Valute v : valCurs.getValute()) {
-            exchangeRate = rateConverter(v);
+            exchangeRate = this.rateConverter(v);
             exchangeRate.setDate(result);
             newValutes.add(exchangeRate);
         }
         return result;
     }
 
-    public static List<ValuteInfo> infoDistillation(ValCurs valCurs) {
-        List<ValuteInfo> result = new ArrayList<>();
-        ValuteInfo info = null;
+    public List<СurrencyInfo> infoDistillation(ValCurs valCurs) {
+        List<СurrencyInfo> result = new ArrayList<>();
+        СurrencyInfo info = null;
         for (ValCurs.Valute v : valCurs.getValute()) {
-            info = infoConverter(v);
+            info = this.infoConverter(v);
             result.add(info);
         }
         return result;
     }
 
-    private static Calendar dateConverter(String stringDate) throws ParseException {
+    private Calendar dateConverter(String stringDate) throws ParseException {
         Calendar date = Calendar.getInstance();
         date.setTime(SIMPLE_DATE_FORMAT.parse(stringDate));
         return date;
     }
 
-    private static ExchangeRate rateConverter(ValCurs.Valute valute) {
+    private ExchangeRate rateConverter(ValCurs.Valute valute) {
         ExchangeRate result = new ExchangeRate();
         result.setNominal(valute.getNominal());
         String toDouble = valute.getValue().replace(',', '.');
@@ -61,8 +63,8 @@ public class ValCursDistillator {
         return result;
     }
 
-    private static ValuteInfo infoConverter(ValCurs.Valute valute) {
-        ValuteInfo result = new ValuteInfo();
+    private СurrencyInfo infoConverter(ValCurs.Valute valute) {
+        СurrencyInfo result = new СurrencyInfo();
         result.setNumCode(valute.getNumCode());
         result.setCharCode(valute.getCharCode());
         result.setName(valute.getName());

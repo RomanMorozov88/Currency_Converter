@@ -10,11 +10,11 @@ public class CurrencyPair {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(nullable = false)
-    private ExchangeRate from;
+    @JoinColumn(name = "from_currency", nullable = false)
+    private СurrencyInfo fromCurrency;
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(nullable = false)
-    private ExchangeRate to;
+    @JoinColumn(name = "to_currency", nullable = false)
+    private СurrencyInfo toCurrency;
 
     public CurrencyPair() {
     }
@@ -27,19 +27,19 @@ public class CurrencyPair {
         this.id = id;
     }
 
-    public ExchangeRate getFrom() {
-        return from;
+    public СurrencyInfo getFromCurrency() {
+        return fromCurrency;
     }
 
-    public void setFrom(ExchangeRate from) {
-        this.from = from;
+    public void setFromCurrency(СurrencyInfo fromCurrency) {
+        this.fromCurrency = fromCurrency;
     }
 
-    public ExchangeRate getTo() {
-        return to;
+    public СurrencyInfo getToCurrency() {
+        return toCurrency;
     }
 
-    public void setTo(ExchangeRate to) {
-        this.to = to;
+    public void setToCurrency(СurrencyInfo toCurrency) {
+        this.toCurrency = toCurrency;
     }
 }

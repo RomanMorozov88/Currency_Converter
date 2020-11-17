@@ -10,11 +10,11 @@ public class ExchangeRate {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(nullable = false)
+    @JoinColumn(name = "date", nullable = false)
     private DateCurs date;
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(nullable = false)
-    private ValuteInfo info;
+    @JoinColumn(name = "info", nullable = false)
+    private СurrencyInfo info;
     private long nominal;
     private double value;
 
@@ -37,11 +37,11 @@ public class ExchangeRate {
         this.date = date;
     }
 
-    public ValuteInfo getInfo() {
+    public СurrencyInfo getInfo() {
         return info;
     }
 
-    public void setInfo(ValuteInfo info) {
+    public void setInfo(СurrencyInfo info) {
         this.info = info;
     }
 
