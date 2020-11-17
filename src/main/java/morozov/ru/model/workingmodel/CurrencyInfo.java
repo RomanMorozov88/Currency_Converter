@@ -6,7 +6,7 @@ import java.util.List;
 
 @Entity
 @Table(name = "valutes")
-public class СurrencyInfo {
+public class CurrencyInfo {
 
     private int numCode;
     private String charCode;
@@ -16,7 +16,7 @@ public class СurrencyInfo {
     @OneToMany(mappedBy = "info", cascade = CascadeType.ALL)
     private List<ExchangeRate> rates = new ArrayList<>();
 
-    public СurrencyInfo() {
+    public CurrencyInfo() {
     }
 
     public int getNumCode() {

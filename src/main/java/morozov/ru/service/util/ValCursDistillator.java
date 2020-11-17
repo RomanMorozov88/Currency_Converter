@@ -1,9 +1,8 @@
 package morozov.ru.service.util;
 
 import morozov.ru.model.fromxsdcentralbank.ValCurs;
-import morozov.ru.model.workingmodel.DateCurs;
 import morozov.ru.model.workingmodel.ExchangeRate;
-import morozov.ru.model.workingmodel.СurrencyInfo;
+import morozov.ru.model.workingmodel.CurrencyInfo;
 import org.springframework.stereotype.Component;
 
 import java.text.ParseException;
@@ -24,23 +23,21 @@ public class ValCursDistillator {
     private final String DATE_FORMAT = "dd.MM.yyyy";
     private final SimpleDateFormat SIMPLE_DATE_FORMAT = new SimpleDateFormat(DATE_FORMAT);
 
-    public DateCurs dateDistillation(ValCurs valCurs) throws ParseException {
-        DateCurs result = new DateCurs();
-        result.setName(valCurs.getName());
-        result.setDate(this.dateConverter(valCurs.getDate()));
-        List<ExchangeRate> newValutes = result.getValutes();
+    public List<ExchangeRate> dateDistillation(ValCurs valCurs) throws ParseException {
+        Calendar date = this.dateConverter(valCurs.getDate());
+        List<ExchangeRate> result = new ArrayList<>();
         ExchangeRate exchangeRate = null;
         for (ValCurs.Valute v : valCurs.getValute()) {
             exchangeRate = this.rateConverter(v);
-            exchangeRate.setDate(result);
-            newValutes.add(exchangeRate);
+            exchangeRate.setDate(date);
+            result.add(exchangeRate);
         }
         return result;
     }
 
-    public List<СurrencyInfo> infoDistillation(ValCurs valCurs) {
-        List<СurrencyInfo> result = new ArrayList<>();
-        СurrencyInfo info = null;
+    public List<CurrencyInfo> infoDistillation(ValCurs valCurs) {
+        List<CurrencyInfo> result = new ArrayList<>();
+        CurrencyInfo info = null;
         for (ValCurs.Valute v : valCurs.getValute()) {
             info = this.infoConverter(v);
             result.add(info);
@@ -63,8 +60,8 @@ public class ValCursDistillator {
         return result;
     }
 
-    private СurrencyInfo infoConverter(ValCurs.Valute valute) {
-        СurrencyInfo result = new СurrencyInfo();
+    private CurrencyInfo infoConverter(ValCurs.Valute valute) {
+        CurrencyInfo result = new CurrencyInfo();
         result.setNumCode(valute.getNumCode());
         result.setCharCode(valute.getCharCode());
         result.setName(valute.getName());

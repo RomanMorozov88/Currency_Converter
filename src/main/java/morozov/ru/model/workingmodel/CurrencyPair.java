@@ -11,10 +11,10 @@ public class CurrencyPair {
     private int id;
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "from_currency", nullable = false)
-    private СurrencyInfo fromCurrency;
+    private CurrencyInfo fromCurrency;
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "to_currency", nullable = false)
-    private СurrencyInfo toCurrency;
+    private CurrencyInfo toCurrency;
 
     public CurrencyPair() {
     }
@@ -27,19 +27,19 @@ public class CurrencyPair {
         this.id = id;
     }
 
-    public СurrencyInfo getFromCurrency() {
+    public CurrencyInfo getFromCurrency() {
         return fromCurrency;
     }
 
-    public void setFromCurrency(СurrencyInfo fromCurrency) {
+    public void setFromCurrency(CurrencyInfo fromCurrency) {
         this.fromCurrency = fromCurrency;
     }
 
-    public СurrencyInfo getToCurrency() {
+    public CurrencyInfo getToCurrency() {
         return toCurrency;
     }
 
-    public void setToCurrency(СurrencyInfo toCurrency) {
+    public void setToCurrency(CurrencyInfo toCurrency) {
         this.toCurrency = toCurrency;
     }
 }

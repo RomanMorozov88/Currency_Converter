@@ -1,6 +1,7 @@
 package morozov.ru.model.workingmodel;
 
 import javax.persistence.*;
+import java.util.Calendar;
 
 @Entity
 @Table(name = "operations")
@@ -12,9 +13,8 @@ public class Operation {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "pair", nullable = false)
     private CurrencyPair pair;
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "date", nullable = false)
-    private DateCurs date;
+    @Temporal(TemporalType.DATE)
+    private Calendar date;
     private double amount;
 
     public Operation() {
@@ -36,11 +36,11 @@ public class Operation {
         this.pair = pair;
     }
 
-    public DateCurs getDate() {
+    public Calendar getDate() {
         return date;
     }
 
-    public void setDate(DateCurs date) {
+    public void setDate(Calendar date) {
         this.date = date;
     }
 

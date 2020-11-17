@@ -1,10 +1,10 @@
 package morozov.ru;
 
 import morozov.ru.model.fromxsdcentralbank.ValCurs;
-import morozov.ru.model.workingmodel.DateCurs;
-import morozov.ru.model.workingmodel.СurrencyInfo;
-import morozov.ru.service.repository.ValCursRepository;
-import morozov.ru.service.repository.СurrencyInfoRepository;
+import morozov.ru.model.workingmodel.ExchangeRate;
+import morozov.ru.model.workingmodel.CurrencyInfo;
+import morozov.ru.service.repository.ExchangeRateRepository;
+import morozov.ru.service.repository.CurrencyInfoRepository;
 import morozov.ru.service.util.ValCursDistillator;
 import morozov.ru.service.util.ValCursGatherer;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,20 +18,20 @@ import java.util.List;
 @Component
 public class DataInit {
 
-    private ValCursRepository valCursRepository;
-    private СurrencyInfoRepository сurrencyInfoRepository;
+    private ExchangeRateRepository exchangeRateRepository;
+    private CurrencyInfoRepository currencyInfoRepository;
     private ValCursGatherer valCursGatherer;
     private ValCursDistillator valCursDistillator;
 
     @Autowired
     public DataInit(
-            ValCursRepository valCursRepository,
-            СurrencyInfoRepository сurrencyInfoRepository,
+            ExchangeRateRepository exchangeRateRepository,
+            CurrencyInfoRepository currencyInfoRepository,
             ValCursGatherer valCursGatherer,
             ValCursDistillator valCursDistillator
     ) {
-        this.valCursRepository = valCursRepository;
-        this.сurrencyInfoRepository = сurrencyInfoRepository;
+        this.exchangeRateRepository = exchangeRateRepository;
+        this.currencyInfoRepository = currencyInfoRepository;
         this.valCursGatherer = valCursGatherer;
         this.valCursDistillator = valCursDistillator;
     }
@@ -40,14 +40,15 @@ public class DataInit {
     @Transactional
     public void setDataInit() {
         ValCurs valCurs = valCursGatherer.getValCursFromCB();
-        DateCurs dateCurs = null;
         try {
-            dateCurs = valCursDistillator.dateDistillation(valCurs);
-            List<СurrencyInfo> infos = valCursDistillator.infoDistillation(valCurs);
-            for (СurrencyInfo vi : infos) {
-                сurrencyInfoRepository.save(vi);
+            List<ExchangeRate> rates = valCursDistillator.dateDistillation(valCurs);
+            List<CurrencyInfo> infos = valCursDistillator.infoDistillation(valCurs);
+            for (CurrencyInfo vi : infos) {
+                currencyInfoRepository.save(vi);
             }
-            valCursRepository.save(dateCurs);
+            for (ExchangeRate e : rates) {
+                exchangeRateRepository.save(e);
+            }
         } catch (ParseException e) {
             e.printStackTrace();
         }

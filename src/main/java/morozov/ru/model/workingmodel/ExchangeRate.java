@@ -1,6 +1,7 @@
 package morozov.ru.model.workingmodel;
 
 import javax.persistence.*;
+import java.util.Calendar;
 
 @Entity
 @Table(name = "rates")
@@ -9,12 +10,11 @@ public class ExchangeRate {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "date", nullable = false)
-    private DateCurs date;
+    @Temporal(TemporalType.DATE)
+    private Calendar date;
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "info", nullable = false)
-    private СurrencyInfo info;
+    private CurrencyInfo info;
     private long nominal;
     private double value;
 
@@ -29,19 +29,19 @@ public class ExchangeRate {
         this.id = id;
     }
 
-    public DateCurs getDate() {
+    public Calendar getDate() {
         return date;
     }
 
-    public void setDate(DateCurs date) {
+    public void setDate(Calendar date) {
         this.date = date;
     }
 
-    public СurrencyInfo getInfo() {
+    public CurrencyInfo getInfo() {
         return info;
     }
 
-    public void setInfo(СurrencyInfo info) {
+    public void setInfo(CurrencyInfo info) {
         this.info = info;
     }
 
