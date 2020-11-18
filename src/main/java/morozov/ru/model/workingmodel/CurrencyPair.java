@@ -1,6 +1,7 @@
 package morozov.ru.model.workingmodel;
 
 import javax.persistence.*;
+import java.util.List;
 
 @Entity
 @Table(name = "pairs")
@@ -15,6 +16,8 @@ public class CurrencyPair {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "to_currency", nullable = false)
     private CurrencyInfo toCurrency;
+    @OneToMany(mappedBy = "pair", cascade = CascadeType.ALL)
+    private List<Operation> operations;
 
     public CurrencyPair() {
     }
@@ -41,5 +44,13 @@ public class CurrencyPair {
 
     public void setToCurrency(CurrencyInfo toCurrency) {
         this.toCurrency = toCurrency;
+    }
+
+    public List<Operation> getOperations() {
+        return operations;
+    }
+
+    public void setOperations(List<Operation> operations) {
+        this.operations = operations;
     }
 }

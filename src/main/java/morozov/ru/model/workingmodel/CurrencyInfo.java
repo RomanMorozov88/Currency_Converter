@@ -58,4 +58,8 @@ public class CurrencyInfo {
     public void setRates(List<ExchangeRate> rates) {
         this.rates = rates;
     }
+
+    public void setRate(ExchangeRate rate) {
+        this.rates.add(rate);
+    }
 }

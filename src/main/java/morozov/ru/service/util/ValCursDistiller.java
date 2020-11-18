@@ -18,28 +18,21 @@ import java.util.List;
  * необходимых для наших нужд.
  */
 @Component
-public class ValCursDistillator {
+public class ValCursDistiller {
 
     private final String DATE_FORMAT = "dd.MM.yyyy";
     private final SimpleDateFormat SIMPLE_DATE_FORMAT = new SimpleDateFormat(DATE_FORMAT);
 
-    public List<ExchangeRate> dateDistillation(ValCurs valCurs) throws ParseException {
+    public List<CurrencyInfo> infoDistillation(ValCurs valCurs) throws ParseException {
         Calendar date = this.dateConverter(valCurs.getDate());
-        List<ExchangeRate> result = new ArrayList<>();
+        List<CurrencyInfo> result = new ArrayList<>();
+        CurrencyInfo info = null;
         ExchangeRate exchangeRate = null;
         for (ValCurs.Valute v : valCurs.getValute()) {
             exchangeRate = this.rateConverter(v);
             exchangeRate.setDate(date);
-            result.add(exchangeRate);
-        }
-        return result;
-    }
-
-    public List<CurrencyInfo> infoDistillation(ValCurs valCurs) {
-        List<CurrencyInfo> result = new ArrayList<>();
-        CurrencyInfo info = null;
-        for (ValCurs.Valute v : valCurs.getValute()) {
             info = this.infoConverter(v);
+            info.setRate(exchangeRate);
             result.add(info);
         }
         return result;

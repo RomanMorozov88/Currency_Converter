@@ -1,0 +1,10 @@
+type Query {
+  getAllCurrencyInfo: [CurrencyInfo]
+}
+
+type CurrencyInfo {
+  numCode: Int
+  charCode: String
+  name: String
+  id: String
+}
