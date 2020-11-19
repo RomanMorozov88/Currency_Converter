@@ -1,4 +1,4 @@
-package morozov.ru;
+package morozov.ru.service.util;
 
 import morozov.ru.model.fromxsdcentralbank.ValCurs;
 import morozov.ru.model.workingmodel.CurrencyInfo;

@@ -12,7 +12,7 @@ public class ExchangeRate {
     private int id;
     @Temporal(TemporalType.DATE)
     private Calendar date;
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "info", nullable = false)
     private CurrencyInfo info;
     private long nominal;

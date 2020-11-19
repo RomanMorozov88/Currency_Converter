@@ -3,6 +3,7 @@ package morozov.ru.service.util;
 import morozov.ru.model.fromxsdcentralbank.ValCurs;
 import morozov.ru.model.workingmodel.ExchangeRate;
 import morozov.ru.model.workingmodel.CurrencyInfo;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.text.ParseException;
@@ -20,8 +21,12 @@ import java.util.List;
 @Component
 public class ValCursDistiller {
 
-    private final String DATE_FORMAT = "dd.MM.yyyy";
-    private final SimpleDateFormat SIMPLE_DATE_FORMAT = new SimpleDateFormat(DATE_FORMAT);
+    private SimpleDateFormat simpleDateFormat;
+
+    @Autowired
+    public ValCursDistiller(SimpleDateFormat simpleDateFormat) {
+        this.simpleDateFormat = simpleDateFormat;
+    }
 
     public List<CurrencyInfo> infoDistillation(ValCurs valCurs) throws ParseException {
         Calendar date = this.dateConverter(valCurs.getDate());
@@ -40,7 +45,7 @@ public class ValCursDistiller {
 
     private Calendar dateConverter(String stringDate) throws ParseException {
         Calendar date = Calendar.getInstance();
-        date.setTime(SIMPLE_DATE_FORMAT.parse(stringDate));
+        date.setTime(simpleDateFormat.parse(stringDate));
         return date;
     }
 

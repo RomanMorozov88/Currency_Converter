@@ -10,10 +10,10 @@ public class Operation {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "pair", nullable = false)
     private CurrencyPair pair;
-    @Temporal(TemporalType.DATE)
+    @Temporal(TemporalType.TIMESTAMP)
     private Calendar date;
     private double amount;
 

@@ -13,7 +13,7 @@ public class CurrencyInfo {
     private String name;
     @Id
     private String id;
-    @OneToMany(mappedBy = "info", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "info", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<ExchangeRate> rates = new ArrayList<>();
 
     public CurrencyInfo() {
