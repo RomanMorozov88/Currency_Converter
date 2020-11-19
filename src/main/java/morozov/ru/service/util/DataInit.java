@@ -48,4 +48,27 @@ public class DataInit {
             e.printStackTrace();
         }
     }
+
+    /**
+     * т.к. страна у нас большая- курсы обновляются
+     * раньше московского времени.
+     * Отсюда может возникунть проблема-
+     * так что лучше подгружать курсы в зависимости от местного времени
+     *
+     * @param day
+     * @param month
+     * @param year
+     */
+    @Transactional
+    public void getValCurses(int day, int month, int year) {
+        ValCurs valCurs = valCursGatherer.getValCursFromCB(day, month, year);
+        try {
+            List<CurrencyInfo> infos = valCursDistiller.infoDistillation(valCurs);
+            for (CurrencyInfo vi : infos) {
+                currencyInfoRepository.save(vi);
+            }
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+    }
 }

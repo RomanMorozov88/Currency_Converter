@@ -43,11 +43,6 @@
                 <configuration>
                     <generatePackage>morozov.ru.model.fromxsdcentralbank</generatePackage>
                     <generateDirectory>${project.basedir}/src/main/java</generateDirectory>
-                    <!--                    Так же можно прочитать из файла:-->
-                    <!--                    <schemaDirectory>${project.basedir}/src/main/resources</schemaDirectory>-->
-                    <!--                    <schemaIncludes>-->
-                    <!--                        <include>ValCurs.xsd</include>-->
-                    <!--                    </schemaIncludes>-->
                     <schemas>
                         <schema>
                             <url>https://cbr.ru/StaticHtml/File/92172/ValCurs.xsd</url>

@@ -1,6 +1,8 @@
 type Query {
     getAllCurrencyInfo: [CurrencyInfo]
     getCurrencyConversion (fromId: String, toId: String, amount: Float): Float
+    getStatistics(fromId: String, toId: String): ExchangeStatistics
+    getOperations(page: Int, size: Int): [Operation]
 }
 
 type CurrencyInfo {
@@ -8,4 +10,20 @@ type CurrencyInfo {
     charCode: String
     name: String
     id: String
+}
+
+type CurrencyPair {
+    fromCurrency: CurrencyInfo
+    toCurrency: CurrencyInfo
+}
+
+type ExchangeStatistics {
+    pair: CurrencyPair
+    averageRate: Float
+    totalSum: Float
+}
+
+type Operation {
+    pair: CurrencyPair
+    amount: Float
 }

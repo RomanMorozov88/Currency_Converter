@@ -22,4 +22,9 @@ public class ValCursGatherer {
         return restTemplate.getForObject(cbUrl, ValCurs.class);
     }
 
+    public ValCurs getValCursFromCB(int day, int month, int year) {
+        String forDate = cbUrl + String.format("?date_req=%d/%d/%d", day, month, year);
+        return restTemplate.getForObject(forDate, ValCurs.class);
+    }
+
 }

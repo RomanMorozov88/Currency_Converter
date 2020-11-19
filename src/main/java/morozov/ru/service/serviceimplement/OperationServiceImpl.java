@@ -1,9 +1,11 @@
 package morozov.ru.service.serviceimplement;
 
 import morozov.ru.model.workingmodel.Operation;
+import morozov.ru.service.repository.OperationRepository;
 import morozov.ru.service.util.DataInit;
 import morozov.ru.model.workingmodel.CurrencyPair;
 import morozov.ru.model.workingmodel.ExchangeRate;
+import org.springframework.data.domain.Pageable;
 import morozov.ru.service.repository.CurrencyPairRepository;
 import morozov.ru.service.repository.ExchangeRateRepository;
 import morozov.ru.service.serviceinterface.OperationService;
@@ -13,22 +15,26 @@ import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Calendar;
+import java.util.List;
 
 @Service
 public class OperationServiceImpl implements OperationService {
 
     private CurrencyPairRepository currencyPairRepository;
     private ExchangeRateRepository exchangeRateRepository;
+    private OperationRepository operationRepository;
     private DataInit dataInit;
 
     @Autowired
     public OperationServiceImpl(
             CurrencyPairRepository currencyPairRepository,
             ExchangeRateRepository exchangeRateRepository,
+            OperationRepository operationRepository,
             DataInit dataInit
     ) {
         this.currencyPairRepository = currencyPairRepository;
         this.exchangeRateRepository = exchangeRateRepository;
+        this.operationRepository = operationRepository;
         this.dataInit = dataInit;
     }
 
@@ -54,9 +60,15 @@ public class OperationServiceImpl implements OperationService {
         ExchangeRate fromRate = exchangeRateRepository.findByDateAndInfo_Id(date, fromId);
         ExchangeRate toRate = exchangeRateRepository.findByDateAndInfo_Id(date, toId);
         if (fromRate == null || toRate == null) {
-            dataInit.getValCurses();
+            dataInit.getValCurses(
+                    date.get(Calendar.DAY_OF_MONTH),
+                    //Не забываем, что
+                    //The first month of the year in the Gregorian and Julian calendars is JANUARY which is 0.
+                    date.get(Calendar.MONTH) + 1,
+                    date.get(Calendar.YEAR)
+            );
             fromRate = exchangeRateRepository.findByDateAndInfo_Id(date, fromId);
-            toRate = exchangeRateRepository.findByDateAndInfo_Id(date, fromId);
+            toRate = exchangeRateRepository.findByDateAndInfo_Id(date, toId);
         }
         CurrencyPair pair = currencyPairRepository
                 .findByFromCurrencyAndToCurrency(fromRate.getInfo(), toRate.getInfo());
@@ -72,8 +84,14 @@ public class OperationServiceImpl implements OperationService {
         return calculate(fromRate, toRate, amount);
     }
 
+    @Override
+    public List<Operation> getAllOnPage(Pageable pageable) {
+        return operationRepository.findAll(pageable).getContent();
+    }
+
     /**
      * Расчёт значений.
+     *
      * @param fromRate
      * @param toRate
      * @param amount
@@ -88,6 +106,7 @@ public class OperationServiceImpl implements OperationService {
     /**
      * Проверка на номинал. Если он отличается от единицы-
      * приводится к значению за единицу.
+     *
      * @param exchangeRate
      * @return
      */
