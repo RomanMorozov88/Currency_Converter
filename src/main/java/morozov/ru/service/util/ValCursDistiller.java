@@ -4,6 +4,7 @@ import morozov.ru.model.fromxsdcentralbank.ValCurs;
 import morozov.ru.model.workingmodel.ExchangeRate;
 import morozov.ru.model.workingmodel.CurrencyInfo;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
 import java.text.ParseException;
@@ -24,7 +25,7 @@ public class ValCursDistiller {
     private SimpleDateFormat simpleDateFormat;
 
     @Autowired
-    public ValCursDistiller(SimpleDateFormat simpleDateFormat) {
+    public ValCursDistiller(@Qualifier("date_bean") SimpleDateFormat simpleDateFormat) {
         this.simpleDateFormat = simpleDateFormat;
     }
 
