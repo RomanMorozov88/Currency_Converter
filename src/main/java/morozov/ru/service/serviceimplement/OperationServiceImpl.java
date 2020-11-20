@@ -1,5 +1,6 @@
 package morozov.ru.service.serviceimplement;
 
+import morozov.ru.model.workingmodel.CurrencyInfo;
 import morozov.ru.model.workingmodel.Operation;
 import morozov.ru.service.repository.OperationRepository;
 import morozov.ru.service.util.DataInit;
@@ -70,11 +71,7 @@ public class OperationServiceImpl implements OperationService {
             fromRate = exchangeRateRepository.findByDateAndInfo_Id(date, fromId);
             toRate = exchangeRateRepository.findByDateAndInfo_Id(date, toId);
         }
-        CurrencyPair pair = currencyPairRepository
-                .findByFromCurrencyAndToCurrency(fromRate.getInfo(), toRate.getInfo());
-        if (pair == null) {
-            pair = new CurrencyPair(fromRate.getInfo(), toRate.getInfo());
-        }
+        CurrencyPair pair = this.getPair(fromRate.getInfo(), toRate.getInfo());
         Operation newOperation = new Operation();
         newOperation.setDate(date);
         newOperation.setPair(pair);
@@ -112,5 +109,20 @@ public class OperationServiceImpl implements OperationService {
      */
     private double divisionByNominal(ExchangeRate exchangeRate) {
         return exchangeRate.getValue() / exchangeRate.getNominal();
+    }
+
+    /**
+     * Получение\создание пары.
+     * @param fromInfo
+     * @param toInfo
+     * @return
+     */
+    private CurrencyPair getPair(CurrencyInfo fromInfo, CurrencyInfo toInfo) {
+        CurrencyPair result = currencyPairRepository
+                .findByFromCurrencyAndToCurrency(fromInfo, toInfo);
+        if (result == null) {
+            result = new CurrencyPair(fromInfo, toInfo);
+        }
+        return result;
     }
 }

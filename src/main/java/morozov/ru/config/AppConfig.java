@@ -21,7 +21,7 @@ public class AppConfig {
 
     @Bean("time_bean")
     public SimpleDateFormat simpleDateFormatForTime() {
-        return new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");
+        return new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
     }
 
 }

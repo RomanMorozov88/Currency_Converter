@@ -32,9 +32,8 @@ public class StatisticsServiceImpl implements StatisticsService {
     public ExchangeStatistics getStatistics(CurrencyPair pair) {
         ExchangeStatistics result = new ExchangeStatistics();
         result.setPair(pair);
-        Calendar date = Calendar.getInstance();
         String fromId = pair.getFromCurrency().getId();
-        List<Operation> operations = this.getNeededOperations(pair, date);
+        List<Operation> operations = this.getNeededOperations(pair);
         double total = 0;
         double average = 0;
         ExchangeRate rate = null;
@@ -48,7 +47,9 @@ public class StatisticsServiceImpl implements StatisticsService {
         return result;
     }
 
-    private List<Operation> getNeededOperations(CurrencyPair pair, Calendar end) {
+    private List<Operation> getNeededOperations(CurrencyPair pair) {
+        //Задаётся недельный промежуток от текущей даты.
+        Calendar end = Calendar.getInstance();
         Calendar start = Calendar.getInstance();
         start.add(Calendar.WEEK_OF_YEAR, -1);
         return operationRepository.getOperations(pair, start, end);

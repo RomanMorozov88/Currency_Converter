@@ -5,8 +5,8 @@ import morozov.ru.model.workingmodel.CurrencyInfo;
 import morozov.ru.model.workingmodel.CurrencyPair;
 import morozov.ru.model.workingmodel.ExchangeStatistics;
 import morozov.ru.model.workingmodel.Operation;
-import morozov.ru.service.repository.CurrencyInfoRepository;
-import morozov.ru.service.repository.CurrencyPairRepository;
+import morozov.ru.service.serviceinterface.CurrencyInfoService;
+import morozov.ru.service.serviceinterface.CurrencyPairService;
 import morozov.ru.service.serviceinterface.OperationService;
 import morozov.ru.service.serviceinterface.StatisticsService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,26 +21,26 @@ import java.util.List;
 @Service
 public class Query implements GraphQLQueryResolver {
 
-    private CurrencyInfoRepository currencyInfoRepository;
-    private CurrencyPairRepository currencyPairRepository;
+    private CurrencyInfoService currencyInfoService;
+    private CurrencyPairService currencyPairService;
     private OperationService operationService;
     private StatisticsService statisticsService;
 
     @Autowired
     public Query(
-            CurrencyInfoRepository currencyInfoRepository,
-            CurrencyPairRepository currencyPairRepository,
+            CurrencyInfoService currencyInfoService,
+            CurrencyPairService currencyPairService,
             OperationService operationService,
             StatisticsService statisticsService
     ) {
-        this.currencyInfoRepository = currencyInfoRepository;
-        this.currencyPairRepository = currencyPairRepository;
+        this.currencyInfoService = currencyInfoService;
+        this.currencyPairService = currencyPairService;
         this.operationService = operationService;
         this.statisticsService = statisticsService;
     }
 
     public List<CurrencyInfo> getAllCurrencyInfo() {
-        return currencyInfoRepository.findAll();
+        return currencyInfoService.getAll();
     }
 
     @Transactional(isolation = Isolation.READ_COMMITTED)
@@ -51,7 +51,7 @@ public class Query implements GraphQLQueryResolver {
     @Transactional(isolation = Isolation.READ_COMMITTED)
     public ExchangeStatistics getStatistics(String fromId, String toId) {
         ExchangeStatistics result = null;
-        CurrencyPair pair = currencyPairRepository.findByFromCurrency_IdAndToCurrency_Id(fromId, toId);
+        CurrencyPair pair = currencyPairService.getByFromAndToIds(fromId, toId);
         if (pair != null) {
             result = statisticsService.getStatistics(pair);
         }
