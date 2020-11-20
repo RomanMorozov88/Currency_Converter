@@ -9,6 +9,7 @@ import org.springframework.stereotype.Component;
 import javax.annotation.PostConstruct;
 import javax.transaction.Transactional;
 import java.text.ParseException;
+import java.util.Calendar;
 import java.util.List;
 
 /**
@@ -36,31 +37,17 @@ public class DataInit {
     @PostConstruct
     @Transactional
     public void getValCurses() {
-        ValCurs valCurs = valCursGatherer.getValCursFromCB();
+        Calendar date = Calendar.getInstance();
+        ValCurs valCurs = valCursGatherer.getValCursFromCB(
+                date.get(Calendar.DAY_OF_MONTH),
+                //Не забываем, что
+                //The first month of the year in the Gregorian and Julian calendars is JANUARY which is 0.
+                date.get(Calendar.MONTH) + 1,
+                date.get(Calendar.YEAR)
+        );
         this.saveValCurses(valCurs);
     }
 
-    /**
-     * т.к. страна у нас большая- курсы обновляются
-     * раньше московского времени.
-     * Отсюда может возникунть проблема-
-     * так что иногда надо подгружать курсы в зависимости от местного времени
-     *
-     * @param day
-     * @param month
-     * @param year
-     */
-    @Transactional
-    public void getValCurses(int day, int month, int year) {
-        ValCurs valCurs = valCursGatherer.getValCursFromCB(day, month, year);
-        this.saveValCurses(valCurs);
-    }
-
-    /**
-     * Одинаковый для  getValCurses() и getValCurses(int day, int month, int year)
-     * код.
-     * @param valCurs
-     */
     private void saveValCurses(ValCurs valCurs) {
         try {
             List<CurrencyInfo> infos = valCursDistiller.infoDistillation(valCurs);

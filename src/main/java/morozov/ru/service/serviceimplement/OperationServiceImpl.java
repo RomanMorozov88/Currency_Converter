@@ -2,6 +2,7 @@ package morozov.ru.service.serviceimplement;
 
 import morozov.ru.model.workingmodel.CurrencyInfo;
 import morozov.ru.model.workingmodel.Operation;
+import morozov.ru.service.repository.CurrencyInfoRepository;
 import morozov.ru.service.repository.OperationRepository;
 import morozov.ru.service.util.DataInit;
 import morozov.ru.model.workingmodel.CurrencyPair;
@@ -21,6 +22,7 @@ import java.util.List;
 @Service
 public class OperationServiceImpl implements OperationService {
 
+    private CurrencyInfoRepository currencyInfoRepository;
     private CurrencyPairRepository currencyPairRepository;
     private ExchangeRateRepository exchangeRateRepository;
     private OperationRepository operationRepository;
@@ -28,15 +30,37 @@ public class OperationServiceImpl implements OperationService {
 
     @Autowired
     public OperationServiceImpl(
+            CurrencyInfoRepository currencyInfoRepository,
             CurrencyPairRepository currencyPairRepository,
             ExchangeRateRepository exchangeRateRepository,
             OperationRepository operationRepository,
             DataInit dataInit
     ) {
+        this.currencyInfoRepository = currencyInfoRepository;
         this.currencyPairRepository = currencyPairRepository;
         this.exchangeRateRepository = exchangeRateRepository;
         this.operationRepository = operationRepository;
         this.dataInit = dataInit;
+    }
+
+    /**
+     * Т.к. на входе могут быть вообще несуществующие id валют-
+     * сначала проверяется их корректность а затем уже происходит
+     * дальнейшая работа.
+     *
+     * @param fromId
+     * @param toId
+     * @param amount
+     * @return
+     */
+    @Override
+    @Transactional(isolation = Isolation.READ_COMMITTED)
+    public Double conversion(String fromId, String toId, double amount) {
+        Double result = null;
+        if (this.checkCurrencyInfo(fromId, toId)) {
+            result = this.subConversion(fromId, toId, amount);
+        }
+        return result;
     }
 
     /**
@@ -54,20 +78,13 @@ public class OperationServiceImpl implements OperationService {
      * @param amount
      * @return
      */
-    @Override
-    @Transactional(isolation = Isolation.READ_COMMITTED)
-    public Double conversion(String fromId, String toId, double amount) {
+    private Double subConversion(String fromId, String toId, double amount) {
         Calendar date = Calendar.getInstance();
         ExchangeRate fromRate = exchangeRateRepository.findByDateAndInfo_Id(date, fromId);
         ExchangeRate toRate = exchangeRateRepository.findByDateAndInfo_Id(date, toId);
         if (fromRate == null || toRate == null) {
-            dataInit.getValCurses(
-                    date.get(Calendar.DAY_OF_MONTH),
-                    //Не забываем, что
-                    //The first month of the year in the Gregorian and Julian calendars is JANUARY which is 0.
-                    date.get(Calendar.MONTH) + 1,
-                    date.get(Calendar.YEAR)
-            );
+            //в случае, если курсов нет- информация обновляется.
+            dataInit.getValCurses();
             fromRate = exchangeRateRepository.findByDateAndInfo_Id(date, fromId);
             toRate = exchangeRateRepository.findByDateAndInfo_Id(date, toId);
         }
@@ -113,6 +130,7 @@ public class OperationServiceImpl implements OperationService {
 
     /**
      * Получение\создание пары.
+     *
      * @param fromInfo
      * @param toInfo
      * @return
@@ -124,5 +142,16 @@ public class OperationServiceImpl implements OperationService {
             result = new CurrencyPair(fromInfo, toInfo);
         }
         return result;
+    }
+
+    /**
+     * На случай, если в запросе пришли несуществующие id
+     *
+     * @param fromId
+     * @param toId
+     * @return
+     */
+    private boolean checkCurrencyInfo(String fromId, String toId) {
+        return currencyInfoRepository.getIfExist(fromId, toId);
     }
 }
