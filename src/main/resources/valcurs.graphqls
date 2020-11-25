@@ -22,11 +22,13 @@ type CurrencyPair {
 type ExchangeStatistics {
     pair: CurrencyPair
     averageRate: Float
-    totalSum: Float
+    totalSumFrom: Float
+    totalSumTo: Float
 }
 
 type Operation {
     pair: CurrencyPair
     date: Calendar
-    amount: Float
+    fromAmount: Float
+    toAmount: Float
 }

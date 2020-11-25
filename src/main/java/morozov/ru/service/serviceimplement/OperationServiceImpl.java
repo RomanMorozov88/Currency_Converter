@@ -1,23 +1,26 @@
 package morozov.ru.service.serviceimplement;
 
 import morozov.ru.model.workingmodel.CurrencyInfo;
-import morozov.ru.model.workingmodel.Operation;
-import morozov.ru.service.repository.CurrencyInfoRepository;
-import morozov.ru.service.repository.OperationRepository;
-import morozov.ru.service.util.DataInit;
 import morozov.ru.model.workingmodel.CurrencyPair;
 import morozov.ru.model.workingmodel.ExchangeRate;
-import org.springframework.data.domain.Pageable;
+import morozov.ru.model.workingmodel.Operation;
+import morozov.ru.service.repository.CurrencyInfoRepository;
 import morozov.ru.service.repository.CurrencyPairRepository;
 import morozov.ru.service.repository.ExchangeRateRepository;
+import morozov.ru.service.repository.OperationRepository;
 import morozov.ru.service.serviceinterface.OperationService;
+import morozov.ru.service.util.DataInit;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.text.DecimalFormat;
 import java.util.Calendar;
 import java.util.List;
+
+import static java.lang.Double.parseDouble;
 
 @Service
 public class OperationServiceImpl implements OperationService {
@@ -27,6 +30,7 @@ public class OperationServiceImpl implements OperationService {
     private ExchangeRateRepository exchangeRateRepository;
     private OperationRepository operationRepository;
     private DataInit dataInit;
+    private DecimalFormat decimalFormat;
 
     @Autowired
     public OperationServiceImpl(
@@ -34,13 +38,15 @@ public class OperationServiceImpl implements OperationService {
             CurrencyPairRepository currencyPairRepository,
             ExchangeRateRepository exchangeRateRepository,
             OperationRepository operationRepository,
-            DataInit dataInit
+            DataInit dataInit,
+            DecimalFormat decimalFormat
     ) {
         this.currencyInfoRepository = currencyInfoRepository;
         this.currencyPairRepository = currencyPairRepository;
         this.exchangeRateRepository = exchangeRateRepository;
         this.operationRepository = operationRepository;
         this.dataInit = dataInit;
+        this.decimalFormat = decimalFormat;
     }
 
     /**
@@ -79,6 +85,7 @@ public class OperationServiceImpl implements OperationService {
      * @return
      */
     private Double subConversion(String fromId, String toId, double amount) {
+        Double result = null;
         Calendar date = Calendar.getInstance();
         ExchangeRate fromRate = exchangeRateRepository.findByDateAndInfo_Id(date, fromId);
         ExchangeRate toRate = exchangeRateRepository.findByDateAndInfo_Id(date, toId);
@@ -92,10 +99,14 @@ public class OperationServiceImpl implements OperationService {
         Operation newOperation = new Operation();
         newOperation.setDate(date);
         newOperation.setPair(pair);
-        newOperation.setAmount(amount);
+        newOperation.setFromAmount(amount);
+
+        result = this.calculate(fromRate, toRate, amount);
+
+        newOperation.setToAmount(result);
         pair.setOperation(newOperation);
         currencyPairRepository.save(pair);
-        return calculate(fromRate, toRate, amount);
+        return result;
     }
 
     @Override
@@ -111,10 +122,11 @@ public class OperationServiceImpl implements OperationService {
      * @param amount
      * @return
      */
-    private double calculate(ExchangeRate fromRate, ExchangeRate toRate, double amount) {
+    private Double calculate(ExchangeRate fromRate, ExchangeRate toRate, double amount) {
         double fromValue = this.divisionByNominal(fromRate);
         double toValue = this.divisionByNominal(toRate);
-        return (fromValue / toValue) * amount;
+        double result = (fromValue / toValue) * amount;
+        return parseDouble(decimalFormat.format(result));
     }
 
     /**

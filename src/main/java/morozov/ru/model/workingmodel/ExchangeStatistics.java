@@ -4,7 +4,8 @@ public class ExchangeStatistics {
 
     private CurrencyPair pair;
     private double averageRate;
-    private double totalSum;
+    private double totalSumFrom;
+    private double totalSumTo;
 
     public ExchangeStatistics() {
     }
@@ -25,12 +26,19 @@ public class ExchangeStatistics {
         this.averageRate = averageRate;
     }
 
-    public double getTotalSum() {
-        return totalSum;
+    public double getTotalSumFrom() {
+        return totalSumFrom;
     }
 
-    public void setTotalSum(double totalSum) {
-        this.totalSum = totalSum;
+    public void setTotalSumFrom(double totalSumFrom) {
+        this.totalSumFrom = totalSumFrom;
     }
 
+    public double getTotalSumTo() {
+        return totalSumTo;
+    }
+
+    public void setTotalSumTo(double totalSumTo) {
+        this.totalSumTo = totalSumTo;
+    }
 }

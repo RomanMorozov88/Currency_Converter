@@ -15,7 +15,8 @@ public class Operation {
     private CurrencyPair pair;
     @Temporal(TemporalType.TIMESTAMP)
     private Calendar date;
-    private double amount;
+    private double fromAmount;
+    private double toAmount;
 
     public Operation() {
     }
@@ -44,11 +45,19 @@ public class Operation {
         this.date = date;
     }
 
-    public double getAmount() {
-        return amount;
+    public double getFromAmount() {
+        return fromAmount;
     }
 
-    public void setAmount(double amount) {
-        this.amount = amount;
+    public void setFromAmount(double fromAmount) {
+        this.fromAmount = fromAmount;
+    }
+
+    public double getToAmount() {
+        return toAmount;
+    }
+
+    public void setToAmount(double toAmount) {
+        this.toAmount = toAmount;
     }
 }

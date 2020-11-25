@@ -34,15 +34,18 @@ public class StatisticsServiceImpl implements StatisticsService {
         result.setPair(pair);
         String fromId = pair.getFromCurrency().getId();
         List<Operation> operations = this.getNeededOperations(pair);
-        double total = 0;
+        double totalFrom = 0;
+        double totalTo = 0;
         double average = 0;
         ExchangeRate rate = null;
         for (Operation o : operations) {
             rate = exchangeRateRepository.findByDateAndInfo_Id(o.getDate(), fromId);
-            total += o.getAmount();
+            totalFrom += o.getFromAmount();
+            totalTo += o.getToAmount();
             average += rate.getValue();
         }
-        result.setTotalSum(total);
+        result.setTotalSumFrom(totalFrom);
+        result.setTotalSumTo(totalTo);
         result.setAverageRate(average / operations.size());
         return result;
     }
