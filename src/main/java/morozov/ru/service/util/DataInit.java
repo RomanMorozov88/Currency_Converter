@@ -36,6 +36,12 @@ public class DataInit {
 
     @PostConstruct
     @Transactional
+    public void getInfosOnStart() {
+        ValCurs valCurs = valCursGatherer.getValCursFromCB();
+        this.saveValCurses(valCurs, false);
+    }
+
+    @Transactional
     public void getValCurses() {
         Calendar date = Calendar.getInstance();
         ValCurs valCurs = valCursGatherer.getValCursFromCB(
@@ -45,12 +51,17 @@ public class DataInit {
                 date.get(Calendar.MONTH) + 1,
                 date.get(Calendar.YEAR)
         );
-        this.saveValCurses(valCurs);
+        this.saveValCurses(valCurs, true);
     }
 
-    private void saveValCurses(ValCurs valCurs) {
+    private void saveValCurses(ValCurs valCurs, boolean flagForRates) {
+        List<CurrencyInfo> infos = null;
         try {
-            List<CurrencyInfo> infos = valCursDistiller.infoDistillation(valCurs);
+            if (flagForRates) {
+                infos = valCursDistiller.infoDistillation(valCurs);
+            } else {
+                infos = valCursDistiller.infoWithoutRateDistillation(valCurs);
+            }
             for (CurrencyInfo vi : infos) {
                 currencyInfoRepository.save(vi);
             }

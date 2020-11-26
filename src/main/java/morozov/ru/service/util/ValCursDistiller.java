@@ -44,6 +44,16 @@ public class ValCursDistiller {
         return result;
     }
 
+    public List<CurrencyInfo> infoWithoutRateDistillation(ValCurs valCurs) throws ParseException {
+        List<CurrencyInfo> result = new ArrayList<>();
+        CurrencyInfo info = null;
+        for (ValCurs.Valute v : valCurs.getValute()) {
+            info = this.infoConverter(v);
+            result.add(info);
+        }
+        return result;
+    }
+
     private Calendar dateConverter(String stringDate) throws ParseException {
         Calendar date = Calendar.getInstance();
         date.setTime(simpleDateFormat.parse(stringDate));
