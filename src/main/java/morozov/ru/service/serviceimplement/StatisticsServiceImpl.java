@@ -10,22 +10,28 @@ import morozov.ru.service.serviceinterface.StatisticsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.text.DecimalFormat;
 import java.util.Calendar;
 import java.util.List;
+
+import static java.lang.Double.parseDouble;
 
 @Service
 public class StatisticsServiceImpl implements StatisticsService {
 
     private OperationRepository operationRepository;
     private ExchangeRateRepository exchangeRateRepository;
+    private DecimalFormat decimalFormat;
 
     @Autowired
     public StatisticsServiceImpl(
             OperationRepository operationRepository,
-            ExchangeRateRepository exchangeRateRepository
+            ExchangeRateRepository exchangeRateRepository,
+            DecimalFormat decimalFormat
     ) {
         this.operationRepository = operationRepository;
         this.exchangeRateRepository = exchangeRateRepository;
+        this.decimalFormat = decimalFormat;
     }
 
     @Override
@@ -44,9 +50,13 @@ public class StatisticsServiceImpl implements StatisticsService {
             totalTo += o.getToAmount();
             average += rate.getValue();
         }
-        result.setTotalSumFrom(totalFrom);
-        result.setTotalSumTo(totalTo);
-        result.setAverageRate(average / operations.size());
+        result.setTotalSumFrom(parseDouble(decimalFormat.format(totalFrom)));
+        result.setTotalSumTo(parseDouble(decimalFormat.format(totalTo)));
+        result.setAverageRate(
+                parseDouble(
+                        decimalFormat.format(average / operations.size())
+                )
+        );
         return result;
     }
 

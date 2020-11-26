@@ -2,9 +2,12 @@ scalar Calendar
 
 type Query {
     getAllCurrencyInfo: [CurrencyInfo]
-    getCurrencyConversion (fromId: String, toId: String, amount: Float): Float
     getStatistics(fromId: String, toId: String): ExchangeStatistics
     getOperations(page: Int, size: Int): [Operation]
+}
+
+type Mutation {
+    getCurrencyConversion (fromId: String, toId: String, amount: Float): Float
 }
 
 type CurrencyInfo {

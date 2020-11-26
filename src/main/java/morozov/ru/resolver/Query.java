@@ -44,11 +44,6 @@ public class Query implements GraphQLQueryResolver {
     }
 
     @Transactional(isolation = Isolation.READ_COMMITTED)
-    public Double getCurrencyConversion(String fromId, String toId, double amount) {
-        return operationService.conversion(fromId, toId, amount);
-    }
-
-    @Transactional(isolation = Isolation.READ_COMMITTED)
     public ExchangeStatistics getStatistics(String fromId, String toId) {
         ExchangeStatistics result = null;
         CurrencyPair pair = currencyPairService.getByFromAndToIds(fromId, toId);
