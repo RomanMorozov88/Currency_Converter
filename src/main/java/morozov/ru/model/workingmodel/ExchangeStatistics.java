@@ -1,5 +1,7 @@
 package morozov.ru.model.workingmodel;
 
+import morozov.ru.model.workingmodel.pair.CurrencyPair;
+
 public class ExchangeStatistics {
 
     private CurrencyPair pair;

@@ -2,7 +2,7 @@ package morozov.ru.resolver;
 
 import com.coxautodev.graphql.tools.GraphQLQueryResolver;
 import morozov.ru.model.workingmodel.CurrencyInfo;
-import morozov.ru.model.workingmodel.CurrencyPair;
+import morozov.ru.model.workingmodel.pair.CurrencyPair;
 import morozov.ru.model.workingmodel.ExchangeStatistics;
 import morozov.ru.model.workingmodel.Operation;
 import morozov.ru.service.serviceinterface.CurrencyInfoService;

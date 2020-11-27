@@ -1,5 +1,7 @@
 package morozov.ru.model.workingmodel;
 
+import morozov.ru.model.workingmodel.pair.CurrencyPair;
+
 import javax.persistence.*;
 import java.util.Calendar;
 
@@ -11,7 +13,8 @@ public class Operation {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
     @ManyToOne
-    @JoinColumn(name = "pair", nullable = false)
+    @JoinColumn(name = "from_currency", nullable = false)
+    @JoinColumn(name = "to_currency", nullable = false)
     private CurrencyPair pair;
     @Temporal(TemporalType.TIMESTAMP)
     private Calendar date;

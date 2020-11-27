@@ -3,6 +3,7 @@ package morozov.ru.service.util;
 import morozov.ru.model.fromxsdcentralbank.ValCurs;
 import morozov.ru.model.workingmodel.CurrencyInfo;
 import morozov.ru.service.repository.CurrencyInfoRepository;
+import morozov.ru.service.serviceinterface.CurrencyInfoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -19,28 +20,22 @@ import java.util.List;
 @Component
 public class DataInit {
 
-    private CurrencyInfoRepository currencyInfoRepository;
+    private CurrencyInfoService currencyInfoService;
     private ValCursGatherer valCursGatherer;
     private ValCursDistiller valCursDistiller;
 
     @Autowired
     public DataInit(
-            CurrencyInfoRepository currencyInfoRepository,
+            CurrencyInfoService currencyInfoService,
             ValCursGatherer valCursGatherer,
             ValCursDistiller valCursDistiller
     ) {
-        this.currencyInfoRepository = currencyInfoRepository;
+        this.currencyInfoService = currencyInfoService;
         this.valCursGatherer = valCursGatherer;
         this.valCursDistiller = valCursDistiller;
     }
 
     @PostConstruct
-    @Transactional
-    public void getInfosOnStart() {
-        ValCurs valCurs = valCursGatherer.getValCursFromCB();
-        this.saveValCurses(valCurs, false);
-    }
-
     @Transactional
     public void getValCurses() {
         Calendar date = Calendar.getInstance();
@@ -51,19 +46,15 @@ public class DataInit {
                 date.get(Calendar.MONTH) + 1,
                 date.get(Calendar.YEAR)
         );
-        this.saveValCurses(valCurs, true);
+        this.saveValCurses(valCurs);
     }
 
-    private void saveValCurses(ValCurs valCurs, boolean flagForRates) {
+    private void saveValCurses(ValCurs valCurs) {
         List<CurrencyInfo> infos = null;
         try {
-            if (flagForRates) {
-                infos = valCursDistiller.infoDistillation(valCurs);
-            } else {
-                infos = valCursDistiller.infoWithoutRateDistillation(valCurs);
-            }
+            infos = valCursDistiller.infoDistillation(valCurs);
             for (CurrencyInfo vi : infos) {
-                currencyInfoRepository.save(vi);
+                currencyInfoService.saveInfo(vi);
             }
         } catch (ParseException e) {
             e.printStackTrace();

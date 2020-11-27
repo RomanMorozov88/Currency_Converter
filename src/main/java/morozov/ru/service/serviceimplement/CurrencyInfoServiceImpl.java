@@ -22,4 +22,9 @@ public class CurrencyInfoServiceImpl implements CurrencyInfoService {
     public List<CurrencyInfo> getAll() {
         return currencyInfoRepository.findAll();
     }
+
+    @Override
+    public CurrencyInfo saveInfo(CurrencyInfo info) {
+        return this.currencyInfoRepository.save(info);
+    }
 }

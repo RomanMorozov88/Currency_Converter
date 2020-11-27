@@ -1,7 +1,7 @@
 package morozov.ru.service.util;
 
 import morozov.ru.model.fromxsdcentralbank.ValCurs;
-import morozov.ru.model.workingmodel.ExchangeRate;
+import morozov.ru.model.workingmodel.rate.ExchangeRate;
 import morozov.ru.model.workingmodel.CurrencyInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -29,6 +29,13 @@ public class ValCursDistiller {
         this.simpleDateFormat = simpleDateFormat;
     }
 
+    /**
+     * Из полученного от ЦБ файла с курсами извлекается лист CurrencyInfo
+     * с уже привязанными к ним ExchangeRate
+     * @param valCurs
+     * @return
+     * @throws ParseException
+     */
     public List<CurrencyInfo> infoDistillation(ValCurs valCurs) throws ParseException {
         Calendar date = this.dateConverter(valCurs.getDate());
         List<CurrencyInfo> result = new ArrayList<>();
@@ -36,19 +43,9 @@ public class ValCursDistiller {
         ExchangeRate exchangeRate = null;
         for (ValCurs.Valute v : valCurs.getValute()) {
             exchangeRate = this.rateConverter(v);
-            exchangeRate.setDate(date);
-            info = this.infoConverter(v);
+            exchangeRate.getId().setDate(date);
+            info = exchangeRate.getInfo();
             info.setRate(exchangeRate);
-            result.add(info);
-        }
-        return result;
-    }
-
-    public List<CurrencyInfo> infoWithoutRateDistillation(ValCurs valCurs) throws ParseException {
-        List<CurrencyInfo> result = new ArrayList<>();
-        CurrencyInfo info = null;
-        for (ValCurs.Valute v : valCurs.getValute()) {
-            info = this.infoConverter(v);
             result.add(info);
         }
         return result;
@@ -65,7 +62,9 @@ public class ValCursDistiller {
         result.setNominal(valute.getNominal());
         String toDouble = valute.getValue().replace(',', '.');
         result.setValue(Double.parseDouble(toDouble));
-        result.setInfo(infoConverter(valute));
+        CurrencyInfo info = this.infoConverter(valute);
+        result.setInfo(info);
+        result.getId().setInfoId(info.getId());
         return result;
     }
 

@@ -1,6 +1,6 @@
 package morozov.ru.service.serviceinterface;
 
-import morozov.ru.model.workingmodel.CurrencyPair;
+import morozov.ru.model.workingmodel.pair.CurrencyPair;
 
 public interface CurrencyPairService {
 

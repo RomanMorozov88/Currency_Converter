@@ -1,14 +1,17 @@
 package morozov.ru.service.serviceimplement;
 
-import morozov.ru.model.workingmodel.CurrencyPair;
-import morozov.ru.model.workingmodel.ExchangeRate;
+import morozov.ru.model.workingmodel.pair.CurrencyPair;
+import morozov.ru.model.workingmodel.rate.ExchangeRate;
 import morozov.ru.model.workingmodel.ExchangeStatistics;
 import morozov.ru.model.workingmodel.Operation;
+import morozov.ru.model.workingmodel.rate.ExchangeRateCompositeID;
 import morozov.ru.service.repository.ExchangeRateRepository;
 import morozov.ru.service.repository.OperationRepository;
 import morozov.ru.service.serviceinterface.StatisticsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.text.DecimalFormat;
 import java.util.Calendar;
@@ -34,6 +37,7 @@ public class StatisticsServiceImpl implements StatisticsService {
         this.decimalFormat = decimalFormat;
     }
 
+    @Transactional(isolation = Isolation.READ_COMMITTED)
     @Override
     public ExchangeStatistics getStatistics(CurrencyPair pair) {
         ExchangeStatistics result = new ExchangeStatistics();
@@ -45,7 +49,7 @@ public class StatisticsServiceImpl implements StatisticsService {
         double average = 0;
         ExchangeRate rate = null;
         for (Operation o : operations) {
-            rate = exchangeRateRepository.findByDateAndInfo_Id(o.getDate(), fromId);
+            rate = exchangeRateRepository.findById(new ExchangeRateCompositeID(o.getDate(), fromId));
             totalFrom += o.getFromAmount();
             totalTo += o.getToAmount();
             average += rate.getValue();

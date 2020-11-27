@@ -1,9 +1,11 @@
 package morozov.ru.service.serviceimplement;
 
 import morozov.ru.model.workingmodel.CurrencyInfo;
-import morozov.ru.model.workingmodel.CurrencyPair;
-import morozov.ru.model.workingmodel.ExchangeRate;
+import morozov.ru.model.workingmodel.pair.CurrencyPair;
+import morozov.ru.model.workingmodel.pair.CurrencyPairCompositeID;
+import morozov.ru.model.workingmodel.rate.ExchangeRate;
 import morozov.ru.model.workingmodel.Operation;
+import morozov.ru.model.workingmodel.rate.ExchangeRateCompositeID;
 import morozov.ru.service.repository.CurrencyInfoRepository;
 import morozov.ru.service.repository.CurrencyPairRepository;
 import morozov.ru.service.repository.ExchangeRateRepository;
@@ -87,15 +89,15 @@ public class OperationServiceImpl implements OperationService {
     private Double subConversion(String fromId, String toId, double amount) {
         Double result = null;
         Calendar date = Calendar.getInstance();
-        ExchangeRate fromRate = exchangeRateRepository.findByDateAndInfo_Id(date, fromId);
-        ExchangeRate toRate = exchangeRateRepository.findByDateAndInfo_Id(date, toId);
+        ExchangeRate fromRate = exchangeRateRepository.findById(new ExchangeRateCompositeID(date, fromId));
+        ExchangeRate toRate = exchangeRateRepository.findById(new ExchangeRateCompositeID(date, toId));
         if (fromRate == null || toRate == null) {
             //в случае, если курсов нет- информация обновляется.
             dataInit.getValCurses();
-            fromRate = exchangeRateRepository.findByDateAndInfo_Id(date, fromId);
-            toRate = exchangeRateRepository.findByDateAndInfo_Id(date, toId);
+            fromRate = exchangeRateRepository.findById(new ExchangeRateCompositeID(date, fromId));
+            toRate = exchangeRateRepository.findById(new ExchangeRateCompositeID(date, toId));
         }
-        CurrencyPair pair = this.getPair(fromRate.getInfo(), toRate.getInfo());
+        CurrencyPair pair = new CurrencyPair(fromRate.getInfo(), toRate.getInfo());
         Operation newOperation = new Operation();
         newOperation.setDate(date);
         newOperation.setPair(pair);
@@ -149,7 +151,7 @@ public class OperationServiceImpl implements OperationService {
      */
     private CurrencyPair getPair(CurrencyInfo fromInfo, CurrencyInfo toInfo) {
         CurrencyPair result = currencyPairRepository
-                .findByFromCurrencyAndToCurrency(fromInfo, toInfo);
+                .findById(new CurrencyPairCompositeID(fromInfo.getId(), toInfo.getId()));
         if (result == null) {
             result = new CurrencyPair(fromInfo, toInfo);
         }

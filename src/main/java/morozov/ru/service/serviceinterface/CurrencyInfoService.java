@@ -9,4 +9,6 @@ import java.util.List;
 public interface CurrencyInfoService {
 
     List<CurrencyInfo> getAll();
+
+    CurrencyInfo saveInfo(CurrencyInfo info);
 }

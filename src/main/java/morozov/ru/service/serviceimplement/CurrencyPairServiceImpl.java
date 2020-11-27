@@ -1,6 +1,7 @@
 package morozov.ru.service.serviceimplement;
 
-import morozov.ru.model.workingmodel.CurrencyPair;
+import morozov.ru.model.workingmodel.pair.CurrencyPair;
+import morozov.ru.model.workingmodel.pair.CurrencyPairCompositeID;
 import morozov.ru.service.repository.CurrencyPairRepository;
 import morozov.ru.service.serviceinterface.CurrencyPairService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +19,6 @@ public class CurrencyPairServiceImpl implements CurrencyPairService {
 
     @Override
     public CurrencyPair getByFromAndToIds(String fromId, String toId) {
-        return currencyPairRepository.findByFromCurrency_IdAndToCurrency_Id(fromId, toId);
+        return currencyPairRepository.findById(new CurrencyPairCompositeID(fromId, toId));
     }
 }
