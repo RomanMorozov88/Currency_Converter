@@ -9,13 +9,17 @@ import morozov.ru.service.repository.ExchangeRateRepository;
 import morozov.ru.service.repository.OperationRepository;
 import morozov.ru.service.serviceinterface.StatisticsService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.text.DecimalFormat;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import static java.lang.Double.parseDouble;
 
@@ -25,16 +29,19 @@ public class StatisticsServiceImpl implements StatisticsService {
     private OperationRepository operationRepository;
     private ExchangeRateRepository exchangeRateRepository;
     private DecimalFormat decimalFormat;
+    private SimpleDateFormat simpleDateFormat;
 
     @Autowired
     public StatisticsServiceImpl(
             OperationRepository operationRepository,
             ExchangeRateRepository exchangeRateRepository,
-            DecimalFormat decimalFormat
+            DecimalFormat decimalFormat,
+            @Qualifier("date_bean") SimpleDateFormat simpleDateFormat
     ) {
         this.operationRepository = operationRepository;
         this.exchangeRateRepository = exchangeRateRepository;
         this.decimalFormat = decimalFormat;
+        this.simpleDateFormat = simpleDateFormat;
     }
 
     @Transactional(isolation = Isolation.READ_COMMITTED)
@@ -43,13 +50,22 @@ public class StatisticsServiceImpl implements StatisticsService {
         ExchangeStatistics result = new ExchangeStatistics();
         result.setPair(pair);
         String fromId = pair.getFromCurrency().getId();
-        List<Operation> operations = this.getNeededOperations(pair);
+
+        Calendar end = Calendar.getInstance();
+        Calendar start = Calendar.getInstance();
+        start.add(Calendar.WEEK_OF_YEAR, -1);
+
+        List<Operation> operations = operationRepository.getOperations(pair, start, end);
+        Map<String, ExchangeRate> ratesMap = this.getNeededRatesInMap(fromId, start, end);
+
         double totalFrom = 0;
         double totalTo = 0;
         double average = 0;
         ExchangeRate rate = null;
+        String dateKey = null;
         for (Operation o : operations) {
-            rate = exchangeRateRepository.findById(new ExchangeRateCompositeID(o.getDate(), fromId));
+            dateKey = simpleDateFormat.format(o.getDate().getTime());
+            rate = ratesMap.get(dateKey);
             totalFrom += o.getFromAmount();
             totalTo += o.getToAmount();
             average += rate.getValue();
@@ -64,12 +80,17 @@ public class StatisticsServiceImpl implements StatisticsService {
         return result;
     }
 
-    private List<Operation> getNeededOperations(CurrencyPair pair) {
-        //Задаётся недельный промежуток от текущей даты.
-        Calendar end = Calendar.getInstance();
-        Calendar start = Calendar.getInstance();
-        start.add(Calendar.WEEK_OF_YEAR, -1);
-        return operationRepository.getOperations(pair, start, end);
+    private Map<String, ExchangeRate> getNeededRatesInMap(String fromId, Calendar start, Calendar end) {
+        Map<String, ExchangeRate> result = null;
+        List<ExchangeRate> rates = exchangeRateRepository.getRatesForPeriod(fromId, start, end);
+        if (rates != null) {
+            result = rates.stream()
+                    .collect(Collectors.toMap(
+                            rate -> simpleDateFormat.format(rate.getId().getDate().getTime()),
+                            rate -> rate
+                    ));
+        }
+        return result;
     }
 
 }

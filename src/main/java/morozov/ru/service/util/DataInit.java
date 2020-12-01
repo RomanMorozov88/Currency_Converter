@@ -37,8 +37,27 @@ public class DataInit {
 
     @PostConstruct
     @Transactional
-    public void getValCurses() {
-        Calendar date = Calendar.getInstance();
+    public boolean getValCurses() {
+        boolean result = false;
+        ValCurs valCurs = valCursGatherer.getValCursFromCB();
+        if (valCurs != null) {
+            this.saveValCurses(valCurs);
+            result = true;
+        }
+        return result;
+    }
+
+    /**
+     * Получение курса на определённую дату.
+     * Нужен для получения курсов в случае, когда на сайье ЦБ они
+     * обновились до того, как закончился текущий день.
+     *
+     * @param date
+     * @return
+     */
+    @Transactional
+    public boolean getValCurses(Calendar date) {
+        boolean result = false;
         ValCurs valCurs = valCursGatherer.getValCursFromCB(
                 date.get(Calendar.DAY_OF_MONTH),
                 //Не забываем, что
@@ -46,7 +65,11 @@ public class DataInit {
                 date.get(Calendar.MONTH) + 1,
                 date.get(Calendar.YEAR)
         );
-        this.saveValCurses(valCurs);
+        if (valCurs != null) {
+            this.saveValCurses(valCurs);
+            result = true;
+        }
+        return result;
     }
 
     private void saveValCurses(ValCurs valCurs) {

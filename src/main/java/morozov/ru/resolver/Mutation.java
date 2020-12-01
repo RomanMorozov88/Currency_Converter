@@ -1,6 +1,7 @@
 package morozov.ru.resolver;
 
 import com.coxautodev.graphql.tools.GraphQLMutationResolver;
+import morozov.ru.model.workingmodel.ResponseResult;
 import morozov.ru.service.serviceinterface.OperationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -18,7 +19,7 @@ public class Mutation implements GraphQLMutationResolver {
     }
 
     @Transactional(isolation = Isolation.READ_COMMITTED)
-    public Double getCurrencyConversion(String fromId, String toId, double amount) {
+    public ResponseResult getCurrencyConversion(String fromId, String toId, double amount) {
         return operationService.conversion(fromId, toId, amount);
     }
 

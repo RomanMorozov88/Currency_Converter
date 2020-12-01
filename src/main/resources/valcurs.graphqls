@@ -7,7 +7,7 @@ type Query {
 }
 
 type Mutation {
-    getCurrencyConversion (fromId: String, toId: String, amount: Float): Float
+    getCurrencyConversion (fromId: String, toId: String, amount: Float): ResponseResult
 }
 
 type CurrencyInfo {
@@ -34,4 +34,8 @@ type Operation {
     date: Calendar
     fromAmount: Float
     toAmount: Float
+}
+
+type ResponseResult {
+    result: Float
 }

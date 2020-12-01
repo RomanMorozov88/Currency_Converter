@@ -1,6 +1,7 @@
 package morozov.ru.service.serviceimplement;
 
 import morozov.ru.model.workingmodel.CurrencyInfo;
+import morozov.ru.model.workingmodel.ResponseResult;
 import morozov.ru.model.workingmodel.pair.CurrencyPair;
 import morozov.ru.model.workingmodel.pair.CurrencyPairCompositeID;
 import morozov.ru.model.workingmodel.rate.ExchangeRate;
@@ -63,10 +64,11 @@ public class OperationServiceImpl implements OperationService {
      */
     @Override
     @Transactional(isolation = Isolation.READ_COMMITTED)
-    public Double conversion(String fromId, String toId, double amount) {
-        Double result = null;
-        if (this.checkCurrencyInfo(fromId, toId)) {
-            result = this.subConversion(fromId, toId, amount);
+    public ResponseResult conversion(String fromId, String toId, double amount) {
+        ResponseResult result = null;
+        if (this.checkCurrencyInfo(fromId, toId) && amount > 0) {
+            result = new ResponseResult();
+            result.setResult(this.subConversion(fromId, toId, amount));
         }
         return result;
     }
@@ -93,9 +95,15 @@ public class OperationServiceImpl implements OperationService {
         ExchangeRate toRate = exchangeRateRepository.findById(new ExchangeRateCompositeID(date, toId));
         if (fromRate == null || toRate == null) {
             //в случае, если курсов нет- информация обновляется.
-            dataInit.getValCurses();
-            fromRate = exchangeRateRepository.findById(new ExchangeRateCompositeID(date, fromId));
-            toRate = exchangeRateRepository.findById(new ExchangeRateCompositeID(date, toId));
+            //Так же из текущего дня может быть уже доступен курс
+            //на следующий день- потому идёт обращение к ЦБ и для определённой даты.
+            if (dataInit.getValCurses(date) || dataInit.getValCurses()) {
+                fromRate = exchangeRateRepository.findById(new ExchangeRateCompositeID(date, fromId));
+                toRate = exchangeRateRepository.findById(new ExchangeRateCompositeID(date, toId));
+            } else {
+                //В случае неудачи обоих попыток загрузки курсов.
+                return null;
+            }
         }
         CurrencyPair pair = new CurrencyPair(fromRate.getInfo(), toRate.getInfo());
         Operation newOperation = new Operation();
