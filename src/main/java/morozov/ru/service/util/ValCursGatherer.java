@@ -22,9 +22,44 @@ public class ValCursGatherer {
         return restTemplate.getForObject(cbUrl, ValCurs.class);
     }
 
+    /**
+     * Например, для получения котировок на заданный день
+     * http://www.cbr.ru/scripts/XML_daily.asp?date_req=02/03/2002
+     * date_req= Date of query (dd/mm/yyyy) (c)
+     *
+     * @param day
+     * @param month
+     * @param year
+     * @return
+     */
     public ValCurs getValCursFromCB(int day, int month, int year) {
-        String forDate = cbUrl + String.format("?date_req=%d/%d/%d", day, month, year);
-        return restTemplate.getForObject(forDate, ValCurs.class);
+        StringBuilder request = new StringBuilder(cbUrl);
+        request.append("?date_req=");
+        this.buildRequestPart(request, day);
+        request.append("/");
+        this.buildRequestPart(request, month);
+        request.append("/");
+        request.append(year);
+        return restTemplate.getForObject(request.toString(), ValCurs.class);
+    }
+
+    /**
+     * Т.к. в запросе к ЦБ используется строгий формат записи даты-
+     * то для корректной работы для дней\месяцев, чей номер меньше десяти
+     * вначале добавляется 0.
+     *
+     * @param builder
+     * @param number
+     */
+    private void buildRequestPart(StringBuilder builder, int number) {
+        if (number < 10) {
+            builder
+                    .append("0")
+                    .append(number);
+        } else {
+            builder
+                    .append(number);
+        }
     }
 
 }

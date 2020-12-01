@@ -2,16 +2,16 @@ package morozov.ru.model.workingmodel;
 
 public class ResponseResult {
 
-    private double result;
+    private Double result;
 
     public ResponseResult() {
     }
 
-    public double getResult() {
+    public Double getResult() {
         return result;
     }
 
-    public void setResult(double result) {
+    public void setResult(Double result) {
         this.result = result;
     }
 }
