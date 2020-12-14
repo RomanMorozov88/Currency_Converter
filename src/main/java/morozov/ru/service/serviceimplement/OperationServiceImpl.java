@@ -67,8 +67,7 @@ public class OperationServiceImpl implements OperationService {
     public ResponseResult conversion(String fromId, String toId, double amount) {
         ResponseResult result = null;
         if (this.checkCurrencyInfo(fromId, toId) && amount > 0) {
-            result = new ResponseResult();
-            result.setResult(this.subConversion(fromId, toId, amount));
+            result = this.subConversion(fromId, toId, amount);
         }
         return result;
     }
@@ -88,20 +87,22 @@ public class OperationServiceImpl implements OperationService {
      * @param amount
      * @return
      */
-    private Double subConversion(String fromId, String toId, double amount) {
-        Double result = null;
+    private ResponseResult subConversion(String fromId, String toId, double amount) {
+        ResponseResult result = new ResponseResult();
         Calendar date = Calendar.getInstance();
-        ExchangeRate fromRate = exchangeRateRepository.findById(new ExchangeRateCompositeID(date, fromId));
-        ExchangeRate toRate = exchangeRateRepository.findById(new ExchangeRateCompositeID(date, toId));
+        ExchangeRate fromRate = exchangeRateRepository.getById(new ExchangeRateCompositeID(date, fromId));
+        ExchangeRate toRate = exchangeRateRepository.getById(new ExchangeRateCompositeID(date, toId));
         if (fromRate == null || toRate == null) {
             //в случае, если курсов нет- информация обновляется.
             //Так же из текущего дня может быть уже доступен курс
-            //на следующий день- потому идёт обращение к ЦБ и для определённой даты.
-            if (dataInit.getValCurses(date) || dataInit.getValCurses()) {
-                fromRate = exchangeRateRepository.findById(new ExchangeRateCompositeID(date, fromId));
-                toRate = exchangeRateRepository.findById(new ExchangeRateCompositeID(date, toId));
-            } else {
-                //В случае неудачи обоих попыток загрузки курсов.
+            //на следующий день- потому идёт обращение к ЦБ на текущую дату.
+            dataInit.getValCurses(date);
+            //Т.к. даже при получении ответа с актуальными курсам- их дата может быть
+            //отличной от текущей даты- то берём курсы из БД на ближайшую к текущей дату.
+            fromRate = exchangeRateRepository.getNearestRate(fromId, date);
+            toRate = exchangeRateRepository.getNearestRate(toId, date);
+            //Если курсов нет вообще- сразу возвращает null
+            if (fromRate == null || toRate == null) {
                 return null;
             }
         }
@@ -111,9 +112,11 @@ public class OperationServiceImpl implements OperationService {
         newOperation.setPair(pair);
         newOperation.setFromAmount(amount);
 
-        result = this.calculate(fromRate, toRate, amount);
+        Double resultAmount = this.calculate(fromRate, toRate, amount);
+        result.setResult(resultAmount);
+        result.setRateDate(fromRate.getId().getDate());
 
-        newOperation.setToAmount(result);
+        newOperation.setToAmount(resultAmount);
         pair.setOperation(newOperation);
         currencyPairRepository.save(pair);
         return result;
@@ -148,22 +151,6 @@ public class OperationServiceImpl implements OperationService {
      */
     private double divisionByNominal(ExchangeRate exchangeRate) {
         return exchangeRate.getValue() / exchangeRate.getNominal();
-    }
-
-    /**
-     * Получение\создание пары.
-     *
-     * @param fromInfo
-     * @param toInfo
-     * @return
-     */
-    private CurrencyPair getPair(CurrencyInfo fromInfo, CurrencyInfo toInfo) {
-        CurrencyPair result = currencyPairRepository
-                .findById(new CurrencyPairCompositeID(fromInfo.getId(), toInfo.getId()));
-        if (result == null) {
-            result = new CurrencyPair(fromInfo, toInfo);
-        }
-        return result;
     }
 
     /**

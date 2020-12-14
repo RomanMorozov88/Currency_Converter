@@ -19,6 +19,6 @@ public class CurrencyPairServiceImpl implements CurrencyPairService {
 
     @Override
     public CurrencyPair getByFromAndToIds(String fromId, String toId) {
-        return currencyPairRepository.findById(new CurrencyPairCompositeID(fromId, toId));
+        return currencyPairRepository.getById(new CurrencyPairCompositeID(fromId, toId));
     }
 }

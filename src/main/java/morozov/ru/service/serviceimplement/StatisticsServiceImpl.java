@@ -29,19 +29,16 @@ public class StatisticsServiceImpl implements StatisticsService {
     private OperationRepository operationRepository;
     private ExchangeRateRepository exchangeRateRepository;
     private DecimalFormat decimalFormat;
-    private SimpleDateFormat simpleDateFormat;
 
     @Autowired
     public StatisticsServiceImpl(
             OperationRepository operationRepository,
             ExchangeRateRepository exchangeRateRepository,
-            DecimalFormat decimalFormat,
-            @Qualifier("date_bean") SimpleDateFormat simpleDateFormat
+            DecimalFormat decimalFormat
     ) {
         this.operationRepository = operationRepository;
         this.exchangeRateRepository = exchangeRateRepository;
         this.decimalFormat = decimalFormat;
-        this.simpleDateFormat = simpleDateFormat;
     }
 
     @Transactional(isolation = Isolation.READ_COMMITTED)
@@ -56,16 +53,14 @@ public class StatisticsServiceImpl implements StatisticsService {
         start.add(Calendar.WEEK_OF_YEAR, -1);
 
         List<Operation> operations = operationRepository.getOperations(pair, start, end);
-        Map<String, ExchangeRate> ratesMap = this.getNeededRatesInMap(fromId, start, end);
-
         double totalFrom = 0;
         double totalTo = 0;
         double average = 0;
         ExchangeRate rate = null;
-        String dateKey = null;
         for (Operation o : operations) {
-            dateKey = simpleDateFormat.format(o.getDate().getTime());
-            rate = ratesMap.get(dateKey);
+            //т.к. дата курса может не совпадать с датой операции-
+            //приходится для каждой операции идти в БД
+            rate = exchangeRateRepository.getNearestRate(fromId, o.getDate());
             totalFrom += o.getFromAmount();
             totalTo += o.getToAmount();
             average += rate.getValue();
@@ -77,19 +72,6 @@ public class StatisticsServiceImpl implements StatisticsService {
                         decimalFormat.format(average / operations.size())
                 )
         );
-        return result;
-    }
-
-    private Map<String, ExchangeRate> getNeededRatesInMap(String fromId, Calendar start, Calendar end) {
-        Map<String, ExchangeRate> result = null;
-        List<ExchangeRate> rates = exchangeRateRepository.getRatesForPeriod(fromId, start, end);
-        if (rates != null) {
-            result = rates.stream()
-                    .collect(Collectors.toMap(
-                            rate -> simpleDateFormat.format(rate.getId().getDate().getTime()),
-                            rate -> rate
-                    ));
-        }
         return result;
     }
 
