@@ -3,13 +3,13 @@ package morozov.ru.service.util;
 import morozov.ru.service.serviceinterface.ConnectWithBank;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.PostConstruct;
-import javax.transaction.Transactional;
 
 /**
  * Получение\загрузка данных при старте приложения
- * а так же в для обновления данных по курсам.
  */
 @Component
 public class DataInit {
@@ -24,7 +24,7 @@ public class DataInit {
     }
 
     @PostConstruct
-    @Transactional
+    @Transactional(isolation = Isolation.READ_COMMITTED)
     public void firstDataInit() {
         connectWithBank.getValCurses();
     }

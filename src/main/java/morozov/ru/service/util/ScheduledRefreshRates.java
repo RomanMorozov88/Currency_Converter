@@ -20,6 +20,9 @@ public class ScheduledRefreshRates {
         this.connectWithBank = connectWithBank;
     }
 
+    /**
+     * https://docs.oracle.com/cd/E12058_01/doc/doc.1014/e12030/cron_expressions.htm
+     */
     @Transactional(isolation = Isolation.READ_COMMITTED)
     @Scheduled(cron = "0 0 23 * * ?") // каждый день в 23:00
     public void refreshRates() {

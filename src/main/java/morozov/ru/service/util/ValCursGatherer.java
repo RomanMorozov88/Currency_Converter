@@ -2,15 +2,13 @@ package morozov.ru.service.util;
 
 import morozov.ru.model.fromxsdcentralbank.ValCurs;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
 @Component
 public class ValCursGatherer {
 
-    @Value("${cb.rates.url}")
-    private String cbUrl;
+    private final static String CB_URL = "http://www.cbr.ru/scripts/XML_daily.asp";
     private RestTemplate restTemplate;
 
     @Autowired
@@ -19,7 +17,7 @@ public class ValCursGatherer {
     }
 
     public ValCurs getValCursFromCB() {
-        return restTemplate.getForObject(cbUrl, ValCurs.class);
+        return restTemplate.getForObject(CB_URL, ValCurs.class);
     }
 
     /**
@@ -33,7 +31,7 @@ public class ValCursGatherer {
      * @return
      */
     public ValCurs getValCursFromCB(int day, int month, int year) {
-        StringBuilder request = new StringBuilder(cbUrl);
+        StringBuilder request = new StringBuilder(CB_URL);
         request.append("?date_req=");
         this.buildRequestPart(request, day);
         request.append("/");

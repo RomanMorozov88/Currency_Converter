@@ -15,6 +15,9 @@ import java.text.ParseException;
 import java.util.Calendar;
 import java.util.List;
 
+/**
+ * Работа с сайтом ЦБ РФ
+ */
 @Service
 @Transactional(isolation = Isolation.READ_COMMITTED)
 public class ConnectWithBankCBRF implements ConnectWithBank {
